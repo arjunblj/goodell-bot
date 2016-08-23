@@ -6,15 +6,23 @@ dotenv.load()
 const yf = new YahooFantasy()
 yf.setUserToken(process.env.YAHOO_USER_TOKEN)
 
-// const wrapRequestAsPromise = (fn) => {
-//   return new Promise((resolve, reject) => {fn})
-// }
-
 export function getStandings() {
   return new Promise((resolve, reject) => {
     yf.league.standings(process.env.LEAGUE_ID, (err, resp) => {
-        resolve(resp)
+        resolve(formatData(resp, 'standings'))
       }
     )
   })
+}
+
+const formatData = (data, type) => {
+  let formatted = ''
+  if (type == 'standings') {
+    let output = `:trophy: :football:    *Current Standings, Week ${data.current_week}*    :football: :trophy:`
+    data.standings.forEach((team, i) => {
+      output += `\n${i+1}. ${team.name}  waiver priority ${team.waiver_priority} — ${team.number_of_moves} moves — ${team.number_of_trades} trades.`
+    })
+    formatted += output
+  }
+  return formatted
 }
