@@ -20,7 +20,7 @@ const formatData = (data, type) => {
   if (type == 'standings') {
     let output = `:trophy: :football:    *Current Standings, Week ${data.current_week}*    :football: :trophy:`
     data.standings.forEach((team, i) => {
-      output += `\n${i+1}. ${team.name}  waiver priority ${team.waiver_priority} — ${team.number_of_moves} moves — ${team.number_of_trades} trades.`
+      output += `\n${i+1}. _${team.name}_ | waiver priority ${team.waiver_priority} — ${team.number_of_moves} moves — ${team.number_of_trades} trades.`
     })
     formatted += output
   }

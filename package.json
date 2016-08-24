@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/arjunblj/goodell-bot#readme",
   "dependencies": {
+    "slackbots": "^0.5.2",
     "yahoo-fantasy-without-auth": "^0.5.1"
   },
   "devDependencies": {
