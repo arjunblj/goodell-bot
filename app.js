@@ -1,14 +1,17 @@
 import Bot from 'slackbots'
+import dotenv from 'dotenv'
 
 import { slackEvents } from './events'
 import { respondMessage } from './message'
 
-let settings = {
-    token: 'xoxb-72335266135-E1I4KlwTkEqvBtzv25QwcRBH',
-    name: 'goodellbot',
+dotenv.load()
+
+const settings = {
+  token: process.env.SLACK_BOT_TOKEN,
+  name: 'goodellbot',
 }
 
-let goodell = new Bot(settings)
+const goodell = new Bot(settings)
 
 goodell.on('start', () => {
   goodell.getUser('goodellbot')
