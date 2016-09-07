@@ -1,13 +1,10 @@
-import dotenv from 'dotenv'
 import YahooFantasy from 'yahoo-fantasy-without-auth'
 
-dotenv.load()
-
 const yf = new YahooFantasy()
-yf.setUserToken(process.env.YAHOO_USER_TOKEN)
 
-export function getStandings() {
+export function getStandings(access_token) {
   return new Promise((resolve, reject) => {
+    yf.setUserToken(access_token)
     yf.league.standings(process.env.LEAGUE_ID, (err, resp) => {
         resolve(formatData(resp, 'standings'))
       }

@@ -1,6 +1,7 @@
 import { masterCommands } from './events'
 
 import { getStandings } from './utils'
+import { getRefreshedAccessToken } from './refreshToken'
 
 let params = {
   icon_url: 'https://s.yimg.com/dh/ap/fantasy/img/app_icon_144x144.jpg',
@@ -9,15 +10,22 @@ let params = {
 export const respondMessage = (bot, message) => {
   const parsedMessage = message.text.split(' ')
   if (parsedMessage.includes('standings')) {
-    fetchMessage().then(messageToPost => {
+    getAccessToken()
+      .then(fetchMessage)
+      .then(messageToPost => {
       const channelToPost = getChannelById(bot, message.channel)
       bot.postMessageToChannel(channelToPost, messageToPost, params)
     })
   }
 }
 
-async function fetchMessage() {
-  const message = await getStandings()
+async function getAccessToken() {
+  const token = await getRefreshedAccessToken()
+  return token
+}
+
+async function fetchMessage(access_token) {
+  const message = await getStandings(access_token)
   return message
 }
 
