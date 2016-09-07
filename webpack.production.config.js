@@ -1,5 +1,6 @@
-var path = require('path')
-var webpack = require('webpack')
+const path = require('path')
+const webpack = require('webpack')
+const nodeExternals = require('webpack-node-externals')
 
 module.exports = {
   entry: [
@@ -11,6 +12,7 @@ module.exports = {
     publicPath: '/'
   },
   target: 'node',
+  externals: [nodeExternals()],
   resolveLoader: {
     root: path.join(__dirname, 'node_modules')
   },
@@ -20,12 +22,6 @@ module.exports = {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
     })
   ],
-  node: {
-    console: true,
-    fs: 'empty',
-    net: 'empty',
-    tls: 'empty'
-  },
   module: {
     noParse: ['ws'],
     loaders: [{
