@@ -1,7 +1,6 @@
-import dotenv from 'dotenv'
 import request from 'request'
 
-dotenv.load()
+if (process.env.NODE_ENV !== 'production'){require('dotenv').load();}
 
 const formData = {
   grant_type: 'refresh_token',

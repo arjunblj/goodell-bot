@@ -1,10 +1,10 @@
 import Bot from 'slackbots'
-import dotenv from 'dotenv'
 
 import { slackEvents } from './events'
 import { respondMessage } from './message'
 
-dotenv.load()
+// On production, this is already set on process.env.
+if (process.env.NODE_ENV !== 'production'){require('dotenv').load();}
 
 const settings = {
   token: process.env.SLACK_BOT_TOKEN,
