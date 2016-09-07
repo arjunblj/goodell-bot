@@ -9,6 +9,7 @@ let params = {
 
 export const respondMessage = (bot, message) => {
   const parsedMessage = message.text.split(' ')
+  console.log(parsedMessage)
   if (parsedMessage.includes('standings')) {
     getAccessToken()
       .then(fetchMessage)
