@@ -30,7 +30,7 @@ module.exports = {
       loader: 'babel',
       query: {
         presets: ['es2015', 'stage-3'],
-        plugins: ['transform-runtime']
+        plugins: ['transform-runtime', 'lodash']
       }
     }, {
       test: /\.json?$/,

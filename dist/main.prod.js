@@ -77,11 +77,11 @@
 
 	'use strict';
 
-	var _express = __webpack_require__(9);
+	var _express = __webpack_require__(10);
 
 	var _express2 = _interopRequireDefault(_express);
 
-	var _slackbots = __webpack_require__(11);
+	var _slackbots = __webpack_require__(13);
 
 	var _slackbots2 = _interopRequireDefault(_slackbots);
 
@@ -145,11 +145,15 @@
 	});
 	exports.respondMessage = undefined;
 
-	var _regenerator = __webpack_require__(8);
+	var _keys = __webpack_require__(7);
+
+	var _keys2 = _interopRequireDefault(_keys);
+
+	var _regenerator = __webpack_require__(9);
 
 	var _regenerator2 = _interopRequireDefault(_regenerator);
 
-	var _asyncToGenerator2 = __webpack_require__(7);
+	var _asyncToGenerator2 = __webpack_require__(8);
 
 	var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
@@ -181,14 +185,14 @@
 	}();
 
 	var fetchMessage = function () {
-	  var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(access_token) {
+	  var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(triggerWord, access_token) {
 	    var message;
 	    return _regenerator2.default.wrap(function _callee2$(_context2) {
 	      while (1) {
 	        switch (_context2.prev = _context2.next) {
 	          case 0:
 	            _context2.next = 2;
-	            return (0, _utils.getStandings)(access_token);
+	            return TRIGGER_WORDS[triggerWord].fetchWith(access_token);
 
 	          case 2:
 	            message = _context2.sent;
@@ -202,10 +206,14 @@
 	    }, _callee2, this);
 	  }));
 
-	  return function fetchMessage(_x) {
+	  return function fetchMessage(_x, _x2) {
 	    return _ref2.apply(this, arguments);
 	  };
 	}();
+
+	// Searches through the message string to match to any triggers..
+	// @todo: Probably should make this more robust instead of returning the first word.
+
 
 	var _events = __webpack_require__(1);
 
@@ -215,23 +223,46 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	var TRIGGER_WORDS = {
+	  standings: {
+	    word: 'standings',
+	    fetchWith: _utils.getStandings
+	  },
+	  transactions: {
+	    word: 'transactions',
+	    fetchWith: _utils.getRecentTransactions
+	  }
+	};
+
 	var params = {
 	  icon_url: 'https://s.yimg.com/dh/ap/fantasy/img/app_icon_144x144.jpg'
 	};
 
 	var respondMessage = exports.respondMessage = function respondMessage(bot, message) {
-	  var parsedMessage = message.text.split(' ');
-	  console.log(parsedMessage);
-	  if (parsedMessage.indexOf('standings') > 0) {
-	    getAccessToken().then(fetchMessage).then(function (messageToPost) {
-	      var channelToPost = getChannelById(bot, message.channel);
+	  console.log(message);
+	  var triggerWord = findTriggerWord(message.text);
+	  if (triggerWord != '') {
+	    getAccessToken().then(function (access_token) {
+	      return fetchMessage(triggerWord, access_token);
+	    }).then(function (messageToPost) {
+	      var channelToPost = getChannelById(bot.channels, message.channel);
 	      bot.postMessageToChannel(channelToPost, messageToPost, params);
 	    });
 	  }
 	};
 
-	var getChannelById = function getChannelById(bot, id) {
-	  return bot.channels.find(function (channel) {
+	var findTriggerWord = function findTriggerWord(message) {
+	  var matchedTrigger = '';
+	  (0, _keys2.default)(TRIGGER_WORDS).forEach(function (trigger) {
+	    if (message.indexOf(trigger) !== -1) {
+	      matchedTrigger += trigger;
+	    }
+	  });
+	  return matchedTrigger;
+	};
+
+	var getChannelById = function getChannelById(channels, id) {
+	  return channels.find(function (channel) {
 	    return channel.id == id;
 	  }).name;
 	};
@@ -251,7 +282,7 @@
 
 	var _promise2 = _interopRequireDefault(_promise);
 
-	var _request = __webpack_require__(10);
+	var _request = __webpack_require__(12);
 
 	var _request2 = _interopRequireDefault(_request);
 
@@ -296,13 +327,23 @@
 
 	var _promise2 = _interopRequireDefault(_promise);
 
-	exports.getStandings = getStandings;
+	var _filter2 = __webpack_require__(11);
 
-	var _yahooFantasyWithoutAuth = __webpack_require__(12);
+	var _filter3 = _interopRequireDefault(_filter2);
+
+	exports.getStandings = getStandings;
+	exports.getRecentTransactions = getRecentTransactions;
+
+	var _yahooFantasyWithoutAuth = __webpack_require__(14);
 
 	var _yahooFantasyWithoutAuth2 = _interopRequireDefault(_yahooFantasyWithoutAuth);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var messageTypes = {
+	  standings: 'standings',
+	  transactions: 'transactions'
+	};
 
 	var yf = new _yahooFantasyWithoutAuth2.default();
 
@@ -310,20 +351,44 @@
 	  return new _promise2.default(function (resolve, reject) {
 	    yf.setUserToken(access_token);
 	    yf.league.standings(process.env.LEAGUE_ID, function (err, resp) {
-	      resolve(formatData(resp, 'standings'));
+	      resolve(formatData(resp, messageTypes.standings));
+	    });
+	  });
+	}
+
+	function getRecentTransactions(access_token) {
+	  return new _promise2.default(function (resolve, reject) {
+	    yf.setUserToken(access_token);
+	    yf.league.transactions(process.env.LEAGUE_ID, function (err, resp) {
+	      resolve(formatData(resp, messageTypes.transactions));
 	    });
 	  });
 	}
 
 	var formatData = function formatData(data, type) {
 	  var formatted = '';
-	  if (type == 'standings') {
-	    var output = ':trophy: :football:    *Current Standings, Week ' + data.current_week + '*    :football: :trophy:';
+
+	  if (type == messageTypes.standings) {
+	    var output = ':trophy: :football:    *Current Standings, Week ' + data.current_week + '*    :football: :trophy:\n';
 	    data.standings.forEach(function (team, i) {
 	      output += '\n' + (i + 1) + '. _' + team.name + '_ | waiver priority ' + team.waiver_priority + ' — ' + team.number_of_moves + ' moves — ' + team.number_of_trades + ' trades.';
 	    });
 	    formatted += output;
 	  }
+
+	  if (type == messageTypes.transactions) {
+	    var recentAddDrops = (0, _filter3.default)(data.transactions, { 'type': 'add/drop' }).slice(0, 5);
+	    var _output = ':rotating_light: :fire: :fire_engine:   *Most Recent Transactions*    :fire_engine: :fire: :rotating_light:\n';
+	    recentAddDrops.map(function (move) {
+	      console.log(move);
+	      var addedPlayer = move.players[0];
+	      var droppedPlayer = move.players[1];
+	      var teamName = addedPlayer.transaction_data.destination_team_name;
+	      _output += '\n_' + teamName + '_\n     :heavy_plus_sign: ' + addedPlayer.name.full + ' (' + addedPlayer.display_position + ' from ' + addedPlayer.editorial_team_abbr + '.) :heavy_minus_sign: ' + droppedPlayer.name.full + ' (' + droppedPlayer.display_position + ' from ' + droppedPlayer.editorial_team_abbr + '.)';
+	    });
+	    formatted += _output;
+	  }
+
 	  return formatted;
 	};
 
@@ -331,34 +396,46 @@
 /* 7 */
 /***/ function(module, exports) {
 
-	module.exports = require("babel-runtime/helpers/asyncToGenerator");
+	module.exports = require("babel-runtime/core-js/object/keys");
 
 /***/ },
 /* 8 */
 /***/ function(module, exports) {
 
-	module.exports = require("babel-runtime/regenerator");
+	module.exports = require("babel-runtime/helpers/asyncToGenerator");
 
 /***/ },
 /* 9 */
 /***/ function(module, exports) {
 
-	module.exports = require("express");
+	module.exports = require("babel-runtime/regenerator");
 
 /***/ },
 /* 10 */
 /***/ function(module, exports) {
 
-	module.exports = require("request");
+	module.exports = require("express");
 
 /***/ },
 /* 11 */
 /***/ function(module, exports) {
 
-	module.exports = require("slackbots");
+	module.exports = require("lodash/filter");
 
 /***/ },
 /* 12 */
+/***/ function(module, exports) {
+
+	module.exports = require("request");
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	module.exports = require("slackbots");
+
+/***/ },
+/* 14 */
 /***/ function(module, exports) {
 
 	module.exports = require("yahoo-fantasy-without-auth");
