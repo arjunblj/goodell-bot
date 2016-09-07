@@ -16,6 +16,10 @@
   "bugs": {
     "url": "https://github.com/arjunblj/goodell-bot/issues"
   },
+  "engines": {
+    "npm": "3.8.6",
+    "node": "4.4.3"
+  },
   "homepage": "https://github.com/arjunblj/goodell-bot#readme",
   "dependencies": {
     "request": "^2.65.0",
