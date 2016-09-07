@@ -77,7 +77,11 @@
 
 	'use strict';
 
-	var _slackbots = __webpack_require__(10);
+	var _express = __webpack_require__(9);
+
+	var _express2 = _interopRequireDefault(_express);
+
+	var _slackbots = __webpack_require__(11);
 
 	var _slackbots2 = _interopRequireDefault(_slackbots);
 
@@ -91,6 +95,17 @@
 	if (false) {
 	  require('dotenv').load();
 	}
+
+	var app = (0, _express2.default)();
+
+	// For avoiding Heroku $PORT
+	app.set('port', process.env.PORT || 5000);
+
+	app.get('/', function (req, res) {
+	  return res.redirect('https://github.com/arjunblj/goodell-bot');
+	}).listen(app.get('port'), function () {
+	  console.log('Running goodell-bot server...', app.get('port'));
+	});
 
 	var settings = {
 	  token: process.env.SLACK_BOT_TOKEN,
@@ -109,7 +124,6 @@
 
 	var listen = function listen(goodell) {
 	  goodell.on('message', function (message) {
-	    console.log(message);
 	    switch (message.type) {
 	      case _events.slackEvents.message:
 	        if (message.text.startsWith('<@' + goodell.self.id + '>')) {
@@ -237,7 +251,7 @@
 
 	var _promise2 = _interopRequireDefault(_promise);
 
-	var _request = __webpack_require__(9);
+	var _request = __webpack_require__(10);
 
 	var _request2 = _interopRequireDefault(_request);
 
@@ -284,7 +298,7 @@
 
 	exports.getStandings = getStandings;
 
-	var _yahooFantasyWithoutAuth = __webpack_require__(11);
+	var _yahooFantasyWithoutAuth = __webpack_require__(12);
 
 	var _yahooFantasyWithoutAuth2 = _interopRequireDefault(_yahooFantasyWithoutAuth);
 
@@ -329,16 +343,22 @@
 /* 9 */
 /***/ function(module, exports) {
 
-	module.exports = require("request");
+	module.exports = require("express");
 
 /***/ },
 /* 10 */
 /***/ function(module, exports) {
 
-	module.exports = require("slackbots");
+	module.exports = require("request");
 
 /***/ },
 /* 11 */
+/***/ function(module, exports) {
+
+	module.exports = require("slackbots");
+
+/***/ },
+/* 12 */
 /***/ function(module, exports) {
 
 	module.exports = require("yahoo-fantasy-without-auth");
