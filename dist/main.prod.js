@@ -109,6 +109,7 @@
 
 	var listen = function listen(goodell) {
 	  goodell.on('message', function (message) {
+	    console.log(message);
 	    switch (message.type) {
 	      case _events.slackEvents.message:
 	        if (message.text.startsWith('<@' + goodell.self.id + '>')) {
@@ -206,7 +207,8 @@
 
 	var respondMessage = exports.respondMessage = function respondMessage(bot, message) {
 	  var parsedMessage = message.text.split(' ');
-	  if (parsedMessage.includes('standings')) {
+	  console.log(parsedMessage);
+	  if (parsedMessage.indexOf('standings') > 0) {
 	    getAccessToken().then(fetchMessage).then(function (messageToPost) {
 	      var channelToPost = getChannelById(bot, message.channel);
 	      bot.postMessageToChannel(channelToPost, messageToPost, params);

@@ -10,7 +10,7 @@ let params = {
 export const respondMessage = (bot, message) => {
   const parsedMessage = message.text.split(' ')
   console.log(parsedMessage)
-  if (parsedMessage.includes('standings')) {
+  if (parsedMessage.indexOf('standings') > 0) {
     getAccessToken()
       .then(fetchMessage)
       .then(messageToPost => {

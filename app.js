@@ -21,7 +21,6 @@ goodell.on('start', () => {
 
 const listen = (goodell) => {
   goodell.on('message', (message) => {
-    console.log(message)
     switch(message.type) {
 			case slackEvents.message:
         if (message.text.startsWith(`<@${goodell.self.id}>`)) {
